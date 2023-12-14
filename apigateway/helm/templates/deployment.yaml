@@ -25,9 +25,6 @@ metadata:
     {{- with .Values.extraLabels -}}
     {{ toYaml . | nindent 4 }}
     {{- end }}
-    {{- with .Values.apigw.extraLabels -}}
-    {{ toYaml . | nindent 4 }}
-    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -48,6 +45,9 @@ spec:
         {{- with .Values.extraLabels -}}
         {{ toYaml . | nindent 8 }}
         {{- end }}
+        {{- with .Values.apigw.extraLabels -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -63,8 +63,11 @@ spec:
         - name: waitforelasticsearch
           image: {{ .Values.global.curlImage }}
           imagePullPolicy: IfNotPresent
+          {{- if .Values.resources.apigwInitContainer }} 
           resources:
             {{- toYaml .Values.resources.apigwInitContainer | nindent 12 }}
+          {{- end }}
+          {{- if .Values.apigw.initContainer.securityContext }} 
           securityContext:
             {{- toYaml .Values.apigwInitContainerSecurityContext | nindent 12 }}
           envFrom:
@@ -172,7 +175,6 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             timeoutSeconds: 1
-            
           readinessProbe:
             httpGet:
               path: /rest/apigateway/health
@@ -214,6 +216,10 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hostAliases }}
+      hostAliases:  
+        {{- toYaml .Values.hostAliases | nindent 8 }}
       {{- end }}
       volumes:
       - name: apigw-config
