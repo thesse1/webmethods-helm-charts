@@ -82,7 +82,7 @@ spec:
               service:
                 name: {{ $svcName }}
                 port:
-                  name: {{ default (printf "%s%s" $name "port") $ing.svcPort  }}
+                  name: {{ default (printf "%s%s%s" "http-" $name "port") $ing.svcPort  }}
               {{- else }}
               serviceName: {{ $svcName }}
               servicePort: {{ default (printf "%s%s" $name "port") $ing.svcPort  }}
