@@ -32,7 +32,7 @@ spec:
   - port: {{ int .Values.apigw.runtimePort }}
     protocol: TCP
     targetPort: {{ int .Values.apigw.runtimePort }}
-    name: rtport
+    name: http-rtport
     {{- if (eq .Values.service.type "ClusterIP") }}
     nodePort: null
     {{- end }}
@@ -54,7 +54,7 @@ spec:
   - port: {{ int .Values.apigw.adminPort }}
     protocol: TCP
     targetPort: {{ int .Values.apigw.adminPort }}
-    name: adminport
+    name: http-adminport
     {{- if (eq .Values.service.type "ClusterIP") }}
     nodePort: null
     {{- end }}
@@ -80,7 +80,7 @@ spec:
   - port: {{ int .Values.apigw.uiPort }}
     protocol: TCP
     targetPort: {{ int .Values.apigw.uiPort }}
-    name: uiport
+    name: http-uiport
     {{- if (eq .Values.service.type "ClusterIP") }}
     nodePort: null
     {{- end }}
