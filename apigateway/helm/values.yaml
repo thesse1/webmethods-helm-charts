@@ -642,3 +642,7 @@ prometheus-elasticsearch-exporter:
     prometheus.io/port: "9108"
     prometheus.io/scheme: http
     prometheus.io/scrape: "true"
+  
+   podLabels:
+    app: prometheus-elasticsearch-exporter
+    version: "1.5.0"

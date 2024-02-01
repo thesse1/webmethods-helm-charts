@@ -48,6 +48,8 @@ spec:
   podTemplate:
     metadata:
       labels: 
+        app: kibana
+        version: {{ .Values.kibana.version }}
         {{- with .Values.extraLabels -}}
         {{ toYaml . | nindent 8 }}
         {{- end }}

@@ -76,6 +76,8 @@ spec:
       podTemplate:    
         metadata:
           labels: 
+            app: elasticsearch
+            version: {{ .Values.elasticsearch.version }}
             {{- with .Values.extraLabels -}}
             {{ toYaml . | nindent 12 }}
             {{- end }}
