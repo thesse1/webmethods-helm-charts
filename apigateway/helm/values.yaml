@@ -113,6 +113,9 @@ ingresses:
     className: "nginx"
     annotations: 
       nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/proxy-body-size: 10m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy_connect_timeout: "600"
       # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     hosts:
       - host:
@@ -131,7 +134,10 @@ ingresses:
     svcName: ""
     svcPort: ""
     className: "nginx"
-    annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 10m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy_connect_timeout: "600"
       # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     hosts:
       - host:
@@ -151,6 +157,10 @@ ingresses:
     className: "nginx"
     annotations: 
       nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/proxy-body-size: 10m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy_connect_timeout: "600"
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     hosts:
       - host:
         paths:
@@ -395,6 +405,17 @@ apigw:
       dashboardInstance: "{{ printf \"http://%s-%s-kb-http:%d\" .Release.Name .Chart.Name (int .Values.kibana.port) }}"
       autostart: false
 
+    cluster:
+      aware: "{{- $isClusterEnabled := or (gt (int .Values.replicaCount) 1) .Values.apigw.clusterAware -}} {{- if $isClusterEnabled -}} true {{- else -}} false {{- end }}"
+      name:  IgniteCluster
+      sessTimeout: "60"
+      actionOnStartupError:  standalone
+      ignite:
+        k8sServiceName: "{{ include \"common.names.fullname\" . }}-rt"
+        k8sNamespace:   "{{ .Release.Namespace }}"
+        discoveryPort:     "10100"
+        communicationPort: "10400"
+
   # -- Extra configuration sources for API Gateway
   # Example: 
   # - type: YAML
@@ -473,6 +494,20 @@ elasticsearch:
   # Overwrite this to use an image from an internal registry or any custom images.
   # Make sure that the image corresponds to the version field.
   image: 
+
+  # -- Resource Settings for Elasticsearch
+  # Example: 
+  # 
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi  
+  resources: {}
+
+  storage: ""
+  storageClassName: ""
 
   # -- The secret name that holds the sag es user for API Gateway.
   secretName: ""
@@ -574,6 +609,8 @@ kibana:
   # -- The default Kibana Port
   port: 5601
 
+  count: 1
+
   # -- Annotations for Kibana
   annotations: {}
   
@@ -646,3 +683,6 @@ prometheus-elasticsearch-exporter:
   podLabels:
     app: prometheus-elasticsearch-exporter
     version: "1.5.0"
+
+# -- Import the content as license key and create a ConfigMap named by `licenseConfigMap` value. You can copy/past the content of your provided license key file here.  
+license: |
